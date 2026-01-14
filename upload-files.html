@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加借款信息</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background-color: #FFFFFF;
+            color: #1F2D3D;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* ===== Top Bar ===== */
+        .top-bar {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            background: white;
+            border-bottom: 1px solid #EDEFF2;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .back-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1F2D3D;
+        }
+
+        .back-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .page-title {
+            flex: 1;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            color: #1F2D3D;
+            margin-right: 32px;
+        }
+
+        /* ===== 页面说明区 ===== */
+        .page-hint {
+            padding: 12px 16px;
+            font-size: 15px;
+            color: #8A8F99;
+            line-height: 1.4;
+        }
+
+        /* ===== 内容区 ===== */
+        .content {
+            flex: 1;
+            padding: 0 16px 120px;
+            overflow-y: auto;
+        }
+
+        /* 平台信息块 */
+        .platform-card {
+            background: white;
+            border: 1px solid #EDEFF2;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .field-group {
+            margin-bottom: 16px;
+        }
+
+        .field-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .field-label {
+            font-size: 14px;
+            color: #1F2D3D;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .field-hint {
+            font-size: 12px;
+            color: #8A8F99;
+            margin-bottom: 8px;
+        }
+
+        /* 下拉框 */
+        .select-wrapper {
+            position: relative;
+        }
+
+        .platform-select {
+            width: 100%;
+            height: 44px;
+            border: 1px solid #EDEFF2;
+            border-radius: 8px;
+            padding: 0 36px 0 12px;
+            font-size: 15px;
+            color: #1F2D3D;
+            background: white;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .select-arrow {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: #8A8F99;
+        }
+
+        .select-arrow svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* 上传区域 */
+        .upload-area {
+            height: 120px;
+            background: #F7F8FA;
+            border: 1px dashed #EDEFF2;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .upload-area:hover {
+            background: #F0F1F3;
+        }
+
+        .upload-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-icon {
+            width: 32px;
+            height: 32px;
+            color: #8A8F99;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #8A8F99;
+        }
+
+        /* 已上传状态 */
+        .upload-area.uploaded {
+            background: white;
+            border: 1px solid #EDEFF2;
+            padding: 8px;
+        }
+
+        .upload-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+        }
+
+        .delete-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .upload-status {
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: #10B981;
+            background: rgba(255,255,255,0.9);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* 添加平台按钮 */
+        .add-platform-btn {
+            width: 100%;
+            height: 44px;
+            border: 1px solid #EB3223;
+            border-radius: 24px;
+            background: white;
+            color: #EB3223;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: all 0.2s;
+        }
+
+        .add-platform-btn:hover {
+            background: #FFF0F0;
+        }
+
+        /* ===== 底部操作区 ===== */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: white;
+            border-top: 1px solid #EDEFF2;
+            padding: 16px;
+            z-index: 100;
+        }
+
+        .cta-btn {
+            width: 100%;
+            height: 48px;
+            background: #EDEFF2;
+            color: #8A8F99;
+            border: none;
+            border-radius: 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: not-allowed;
+            transition: all 0.2s;
+        }
+
+        .cta-btn.active {
+            background: #EB3223;
+            color: white;
+            cursor: pointer;
+        }
+
+        .cta-btn.active:hover {
+            background: #CC0000;
+        }
+
+        /* ===== Bottom Sheet ===== */
+        .bottom-sheet-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            display: none;
+        }
+
+        .bottom-sheet {
+            position: fixed;
+            bottom: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: white;
+            border-radius: 16px 16px 0 0;
+            z-index: 201;
+            transition: bottom 0.3s ease;
+        }
+
+        .bottom-sheet.show {
+            bottom: 0;
+        }
+
+        .bottom-sheet-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1F2D3D;
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid #EDEFF2;
+        }
+
+        .bottom-sheet-options {
+            padding: 8px 16px;
+        }
+
+        .sheet-option {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            border-radius: 8px;
+            padding: 0 12px;
+            transition: background 0.2s;
+        }
+
+        .sheet-option:hover {
+            background: #F7F8FA;
+        }
+
+        .sheet-option svg {
+            width: 24px;
+            height: 24px;
+            color: #8A8F99;
+        }
+
+        .sheet-option span {
+            font-size: 15px;
+            color: #1F2D3D;
+        }
+
+        .sheet-cancel {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #1F2D3D;
+            border-top: 1px solid #EDEFF2;
+            cursor: pointer;
+        }
+
+        .sheet-cancel:hover {
+            background: #F7F8FA;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <button class="back-btn" onclick="goBack()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
+            <div class="page-title">添加借款信息</div>
+        </header>
+
+        <!-- 页面说明 -->
+        <div class="page-hint">
+            请为每个平台上传相关借款资料,<br>
+            AI 将基于这些信息进行分析
+        </div>
+
+        <!-- 内容区 -->
+        <main class="content" id="content">
+            <!-- 平台信息块 -->
+            <div class="platform-card">
+                <div class="field-group">
+                    <div class="field-label">选择平台</div>
+                    <div class="select-wrapper">
+                        <select class="platform-select" onchange="handlePlatformChange(this)">
+                            <option value="">请选择借款平台</option>
+                            <option value="akulaku">Akulaku</option>
+                            <option value="kredivo">Kredivo</option>
+                            <option value="easycash">EasyCash</option>
+                            <option value="adakami">AdaKami</option>
+                            <option value="shopee">Shopee</option>
+                            <option value="other">其他银行</option>
+                        </select>
+                        <div class="select-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <div class="field-label">可用额度截图</div>
+                    <div class="field-hint">包含您在该平台的当前剩余信用额度页面</div>
+                    <div class="upload-area" onclick="openBottomSheet(this, 'credit')">
+                        <div class="upload-placeholder">
+                            <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span class="upload-text">上传截图</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <div class="field-label">当前账单截图</div>
+                    <div class="field-hint">包含应还本金、利息及手续费等明细信息</div>
+                    <div class="upload-area" onclick="openBottomSheet(this, 'bill')">
+                        <div class="upload-placeholder">
+                            <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span class="upload-text">上传截图</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <div class="field-label">还款日期截图</div>
+                    <div class="field-hint">用于确认您下一期还款的截止日期</div>
+                    <div class="upload-area" onclick="openBottomSheet(this, 'date')">
+                        <div class="upload-placeholder">
+                            <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span class="upload-text">上传截图</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 添加平台按钮 -->
+            <button class="add-platform-btn" onclick="addPlatform()">+ 添加另一个平台</button>
+        </main>
+
+        <!-- 底部操作区 -->
+        <div class="bottom-bar">
+            <button class="cta-btn" id="submitBtn" onclick="handleSubmit()">开始 AI 分析</button>
+        </div>
+    </div>
+
+    <!-- Bottom Sheet -->
+    <div class="bottom-sheet-overlay" id="sheetOverlay" onclick="closeBottomSheet()"></div>
+    <div class="bottom-sheet" id="bottomSheet">
+        <div class="bottom-sheet-title">上传图片</div>
+        <div class="bottom-sheet-options">
+            <div class="sheet-option" onclick="handleCamera()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span>拍照</span>
+            </div>
+            <div class="sheet-option" onclick="handleGallery()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <span>从相册选择</span>
+            </div>
+        </div>
+        <div class="sheet-cancel" onclick="closeBottomSheet()">取消</div>
+    </div>
+
+    <script>
+        let currentUploadArea = null;
+        let platformCardCount = 1;
+
+        function goBack() {
+            window.history.back();
+        }
+
+        function openBottomSheet(area, type) {
+            currentUploadArea = area;
+            document.getElementById('sheetOverlay').style.display = 'block';
+            document.getElementById('bottomSheet').classList.add('show');
+        }
+
+        function closeBottomSheet() {
+            document.getElementById('sheetOverlay').style.display = 'none';
+            document.getElementById('bottomSheet').classList.remove('show');
+            currentUploadArea = null;
+        }
+
+        function handleCamera() {
+            alert('相机功能需要相机权限');
+            closeBottomSheet();
+        }
+
+        function handleGallery() {
+            // 模拟上传
+            if (currentUploadArea) {
+                const placeholder = currentUploadArea.querySelector('.upload-placeholder');
+                currentUploadArea.classList.add('uploaded');
+                currentUploadArea.innerHTML = `
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'%3E%3Crect fill='%23F7F8FA' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' fill='%238A8F99' text-anchor='middle' dy='.3em'%3E已上传图片预览%3C/text%3E%3C/svg%3E" class="upload-preview" onclick="openBottomSheet(this.parentElement, '')">
+                    <div class="delete-btn" onclick="deleteImage(event, this.parentElement)">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </div>
+                    <div class="upload-status">已上传</div>
+                `;
+                checkSubmitState();
+            }
+            closeBottomSheet();
+        }
+
+        function deleteImage(event, area) {
+            event.stopPropagation();
+            area.classList.remove('uploaded');
+            area.innerHTML = `
+                <div class="upload-placeholder">
+                    <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    <span class="upload-text">上传截图</span>
+                </div>
+            `;
+            area.onclick = function() { openBottomSheet(this, ''); };
+            checkSubmitState();
+        }
+
+        function handlePlatformChange(select) {
+            const card = select.closest('.platform-card');
+            const allSelects = document.querySelectorAll('.platform-select');
+            const selectedValue = select.value;
+
+            allSelects.forEach(s => {
+                if (s !== select) {
+                    const options = s.querySelectorAll('option');
+                    options.forEach(opt => {
+                        if (opt.value === selectedValue) {
+                            opt.disabled = true;
+                        }
+                    });
+                }
+            });
+            checkSubmitState();
+        }
+
+        function addPlatform() {
+            platformCardCount++;
+            const content = document.getElementById('content');
+            const newCard = document.createElement('div');
+            newCard.className = 'platform-card';
+            newCard.innerHTML = `
+                <div class="field-group">
+                    <div class="field-label">选择平台</div>
+                    <div class="select-wrapper">
+                        <select class="platform-select" onchange="handlePlatformChange(this)">
+                            <option value="">请选择借款平台</option>
+                            <option value="akulaku">Akulaku</option>
+                            <option value="kredivo">Kredivo</option>
+                            <option value="easycash">EasyCash</option>
+                            <option value="adakami">AdaKami</option>
+                            <option value="shopee">Shopee</option>
+                            <option value="other">其他银行</option>
+                        </select>
+                        <div class="select-arrow">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <div class="field-label">可用额度截图</div>
+                    <div class="field-hint">包含您在该平台的当前剩余信用额度页面</div>
+                    <div class="upload-area" onclick="openBottomSheet(this, 'credit')">
+                        <div class="upload-placeholder">
+                            <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span class="upload-text">上传截图</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <div class="field-label">当前账单截图</div>
+                    <div class="field-hint">包含应还本金、利息及手续费等明细信息</div>
+                    <div class="upload-area" onclick="openBottomSheet(this, 'bill')">
+                        <div class="upload-placeholder">
+                            <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span class="upload-text">上传截图</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <div class="field-label">还款日期截图</div>
+                    <div class="field-hint">用于确认您下一期还款的截止日期</div>
+                    <div class="upload-area" onclick="openBottomSheet(this, 'date')">
+                        <div class="upload-placeholder">
+                            <svg class="upload-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span class="upload-text">上传截图</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            content.insertBefore(newCard, content.querySelector('.add-platform-btn'));
+            checkSubmitState();
+        }
+
+        function checkSubmitState() {
+            const cards = document.querySelectorAll('.platform-card');
+            let hasValidPlatform = false;
+
+            for (const card of cards) {
+                const select = card.querySelector('.platform-select');
+                const uploads = card.querySelectorAll('.upload-area.uploaded');
+                
+                if (select.value && uploads.length === 3) {
+                    hasValidPlatform = true;
+                    break;
+                }
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            if (hasValidPlatform) {
+                submitBtn.classList.add('active');
+            } else {
+                submitBtn.classList.remove('active');
+            }
+        }
+
+        function handleSubmit() {
+            const submitBtn = document.getElementById('submitBtn');
+            if (!submitBtn.classList.contains('active')) {
+                return;
+            }
+            // 上传完成后跳转到分析页面
+            window.location.href = 'analyzing.html';
+        }
+    </script>
+</body>
+</html>

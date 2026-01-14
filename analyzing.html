@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 正在分析</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background-color: #FFFFFF;
+            color: #1F2D3D;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* ===== Top Bar ===== */
+        .top-bar {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1F2D3D;
+        }
+
+        /* ===== 内容区 ===== */
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 32px;
+        }
+
+        /* AI 动效区域 */
+        .ai-animation {
+            width: 120px;
+            height: 120px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+
+        .ai-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid #EB3223;
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+
+        .ai-circle:nth-child(2) {
+            width: 80%;
+            height: 80%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .ai-circle:nth-child(3) {
+            width: 60%;
+            height: 60%;
+            animation: pulse 2s ease-in-out infinite 0.3s;
+        }
+
+        .ai-circle:nth-child(4) {
+            width: 40%;
+            height: 40%;
+            animation: pulse 2s ease-in-out infinite 0.6s;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.3;
+            }
+        }
+
+        .ai-icon {
+            width: 48px;
+            height: 48px;
+            color: #EB3223;
+            z-index: 1;
+        }
+
+        /* 主提示文案 */
+        .main-text {
+            font-size: 20px;
+            font-weight: 500;
+            color: #1F2D3D;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .sub-text {
+            font-size: 15px;
+            color: #8A8F99;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        /* 进度步骤列表 */
+        .progress-list {
+            width: 100%;
+            max-width: 280px;
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            font-size: 15px;
+        }
+
+        .progress-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #C8CDD4;
+        }
+
+        .progress-icon.active {
+            color: #1F2D3D;
+        }
+
+        .progress-icon.completed {
+            color: #8A8F99;
+        }
+
+        .progress-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .loading-dot {
+            width: 12px;
+            height: 12px;
+            border: 2px solid #EB3223;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .progress-text {
+            color: #C8CDD4;
+        }
+
+        .progress-text.active {
+            color: #1F2D3D;
+        }
+
+        .progress-text.completed {
+            color: #8A8F99;
+        }
+
+        /* 底部提示 */
+        .bottom-hint {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 13px;
+            color: #8A8F99;
+            text-align: center;
+        }
+
+        /* 错误提示 */
+        .error-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .error-modal {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 280px;
+            text-align: center;
+        }
+
+        .error-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            color: #EB3223;
+        }
+
+        .error-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #1F2D3D;
+            margin-bottom: 8px;
+        }
+
+        .error-text {
+            font-size: 14px;
+            color: #8A8F99;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .error-btn {
+            width: 100%;
+            height: 44px;
+            background: #EB3223;
+            color: white;
+            border: none;
+            border-radius: 22px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="page-title">AI 正在分析</div>
+        </header>
+
+        <!-- 内容区 -->
+        <main class="content">
+            <!-- AI 动效区域 -->
+            <div class="ai-animation">
+                <div class="ai-circle"></div>
+                <div class="ai-circle"></div>
+                <div class="ai-circle"></div>
+                <div class="ai-circle"></div>
+                <svg class="ai-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                </svg>
+            </div>
+
+            <!-- 主提示文案 -->
+            <div class="main-text" id="mainText">正在为你分析借款信息</div>
+            <div class="sub-text" id="subText">这通常需要几秒钟，请稍候</div>
+
+            <!-- 进度步骤列表 -->
+            <div class="progress-list">
+                <div class="progress-item" id="step1">
+                    <div class="progress-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <div class="progress-text">识别账单与额度信息</div>
+                </div>
+                <div class="progress-item" id="step2">
+                    <div class="progress-icon">
+                        <div class="loading-dot"></div>
+                    </div>
+                    <div class="progress-text active">整理你的负债结构</div>
+                </div>
+                <div class="progress-item" id="step3">
+                    <div class="progress-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                        </svg>
+                    </div>
+                    <div class="progress-text">生成 AI 分析与建议</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 底部提示 -->
+        <div class="bottom-hint">分析过程中请勿关闭页面</div>
+    </div>
+
+    <!-- 错误提示 -->
+    <div class="error-overlay" id="errorOverlay">
+        <div class="error-modal">
+            <svg class="error-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <div class="error-title">分析失败</div>
+            <div class="error-text">分析暂时失败，请稍后重试</div>
+            <button class="error-btn" onclick="goBack()">返回重新上传</button>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 2;
+        let analysisTimeout;
+
+        function updateProgress() {
+            // 步骤1: 识别账单与额度信息
+            const step1 = document.getElementById('step1');
+            const step1Icon = step1.querySelector('.progress-icon');
+            const step1Text = step1.querySelector('.progress-text');
+
+            step1Icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
+            step1Icon.classList.remove('active');
+            step1Icon.classList.add('completed');
+            step1Text.classList.remove('active');
+            step1Text.classList.add('completed');
+
+            // 步骤2: 整理你的负债结构
+            const step2 = document.getElementById('step2');
+            const step2Icon = step2.querySelector('.progress-icon');
+            const step2Text = step2.querySelector('.progress-text');
+
+            if (currentStep === 2) {
+                step2Icon.innerHTML = `<div class="loading-dot"></div>`;
+                step2Icon.classList.add('active');
+                step2Text.classList.add('active');
+            } else if (currentStep >= 3) {
+                step2Icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
+                step2Icon.classList.remove('active');
+                step2Icon.classList.add('completed');
+                step2Text.classList.remove('active');
+                step2Text.classList.add('completed');
+            }
+
+            // 步骤3: 生成 AI 分析与建议
+            const step3 = document.getElementById('step3');
+            const step3Icon = step3.querySelector('.progress-icon');
+            const step3Text = step3.querySelector('.progress-text');
+
+            if (currentStep === 3) {
+                step3Icon.innerHTML = `<div class="loading-dot"></div>`;
+                step3Icon.classList.add('active');
+                step3Text.classList.add('active');
+            } else if (currentStep > 3) {
+                step3Icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
+                step3Icon.classList.remove('active');
+                step3Icon.classList.add('completed');
+                step3Text.classList.remove('active');
+                step3Text.classList.add('completed');
+            }
+        }
+
+        function startAnalysis() {
+            // 步骤2: 2秒后完成
+            setTimeout(() => {
+                currentStep = 3;
+                updateProgress();
+            }, 2000);
+
+            // 步骤3: 4秒后完成
+            setTimeout(() => {
+                currentStep = 4;
+                updateProgress();
+
+                // 分析完成提示
+                document.getElementById('mainText').textContent = '分析完成';
+                document.getElementById('subText').textContent = '正在生成分析报告...';
+
+                // 停留500ms后跳转到分析报告页（已建档版本）
+                setTimeout(() => {
+                    window.location.href = 'report.html';
+                }, 500);
+            }, 4000);
+
+            // 超时保护（10秒后）
+            analysisTimeout = setTimeout(() => {
+                if (currentStep < 4) {
+                    document.getElementById('subText').textContent = '正在进行更深入的分析，请稍候';
+                }
+            }, 10000);
+        }
+
+        function goBack() {
+            document.getElementById('errorOverlay').style.display = 'none';
+            window.location.href = 'upload-files.html';
+        }
+
+        // 页面加载后开始分析
+        updateProgress();
+        startAnalysis();
+    </script>
+</body>
+</html>

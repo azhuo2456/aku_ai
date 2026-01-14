@@ -1,0 +1,164 @@
+/* ===== AI 助手弹窗通用样式 ===== */
+.ai-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: flex-end;
+    justify-content: center;
+    z-index: 200;
+}
+
+.ai-modal-overlay.show {
+    display: flex;
+}
+
+.ai-modal {
+    width: 100%;
+    max-width: 430px;
+    background: white;
+    border-radius: 24px 24px 0 0;
+    padding: 24px;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+.ai-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.ai-avatar {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #EB3223, #CC0000);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-avatar svg {
+    width: 28px;
+    height: 28px;
+    color: white;
+}
+
+.ai-title {
+    flex: 1;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1F2D3D;
+}
+
+.ai-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: #F5F5F5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.ai-close svg {
+    width: 20px;
+    height: 20px;
+    color: #8A8F99;
+}
+
+.ai-content {
+    font-size: 15px;
+    color: #1F2D3D;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.ai-info-box {
+    background: #FFF0F0;
+    border-left: 3px solid #EB3223;
+    padding: 12px 16px;
+    margin: 16px 0;
+    border-radius: 8px;
+}
+
+.ai-info-title {
+    font-weight: 500;
+    color: #EB3223;
+    margin-bottom: 8px;
+}
+
+.ai-info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 14px;
+}
+
+.ai-info-label {
+    color: #8A8F99;
+}
+
+.ai-info-value {
+    font-weight: 500;
+    color: #1F2D3D;
+}
+
+.ai-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ai-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.ai-btn-primary {
+    background: #EB3223;
+    color: white;
+}
+
+.ai-btn-primary:hover {
+    background: #CC0000;
+}
+
+.ai-btn-secondary {
+    background: #F7F8FA;
+    color: #1F2D3D;
+}
+
+.ai-btn-secondary:hover {
+    background: #EDEFF2;
+}
+
+.ai-btn svg {
+    width: 18px;
+    height: 18px;
+}

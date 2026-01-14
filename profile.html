@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background-color: #FFFFFF;
+            color: #1F2D3D;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* ===== Top Bar ===== */
+        .top-bar {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            background: white;
+            border-bottom: 1px solid #EDEFF2;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .avatar-lg {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #EB3223, #CC0000);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .page-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1F2D3D;
+            margin-left: 12px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn svg {
+            width: 20px;
+            height: 20px;
+            color: #8A8F99;
+        }
+
+        /* ===== 内容区 ===== */
+        .content {
+            flex: 1;
+            padding: 16px;
+            padding-bottom: 80px;
+            overflow-y: auto;
+            position: relative;
+            min-height: calc(100vh - 120px);
+        }
+
+        .module {
+            margin-bottom: 20px;
+        }
+
+        /* ===== 个人信息卡片 ===== */
+        .profile-card {
+            background: white;
+            border: 1px solid #EDEFF2;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .profile-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #EB3223, #CC0000);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1F2D3D;
+            margin-bottom: 4px;
+        }
+
+        .profile-email {
+            font-size: 13px;
+            color: #8A8F99;
+            margin-bottom: 4px;
+        }
+
+        .profile-balance {
+            font-size: 18px;
+            font-weight: 700;
+            color: #EB3223;
+        }
+
+        .edit-btn {
+            height: 36px;
+            padding: 0 20px;
+            background: #EB3223;
+            color: white;
+            border: none;
+            border-radius: 18px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* ===== 功能模块卡片 ===== */
+        .function-card {
+            background: white;
+            border: 1px solid #EDEFF2;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .function-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .function-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1F2D3D;
+        }
+
+        .function-desc {
+            font-size: 13px;
+            color: #8A8F99;
+            margin-bottom: 12px;
+        }
+
+        .function-content {
+            margin-bottom: 12px;
+        }
+
+        .function-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #F7F8FA;
+        }
+
+        .function-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-label {
+            font-size: 14px;
+            color: #1F2D3D;
+        }
+
+        .item-value {
+            font-size: 14px;
+            color: #8A8F99;
+        }
+
+        .item-value.paid {
+            color: #6BCF7F;
+        }
+
+        .item-value.pending {
+            color: #EB3223;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #EDEFF2;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #EB3223;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .outline-btn {
+            width: 100%;
+            height: 40px;
+            background: white;
+            color: #EB3223;
+            border: 1.5px solid #EB3223;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .outline-btn:hover {
+            background: #FFF0F0;
+        }
+
+        /* ===== 操作区 ===== */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            flex: 1;
+            height: 48px;
+            background: #EB3223;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #CC0000;
+        }
+
+        .action-btn.secondary {
+            background: #F7F8FA;
+            color: #1F2D3D;
+        }
+
+        .action-btn.secondary:hover {
+            background: #EDEFF2;
+        }
+
+        /* ===== Tab Bar ===== */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            height: 64px;
+            background: white;
+            border-top: 1px solid #EDEFF2;
+            display: flex;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #8A8F99;
+            cursor: pointer;
+        }
+
+        .tab-item.active {
+            color: #EB3223;
+        }
+
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 2px;
+        }
+
+        .tab-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        /* 中间 FAB */
+        .fab {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 56px;
+            height: 56px;
+            background: #EB3223;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 101;
+            cursor: pointer;
+        }
+
+        .fab svg {
+            width: 28px;
+            height: 28px;
+            color: white;
+        }
+
+        /* AI 机器人入口 - 固定在页面右下角（内容区内） */
+        .ai-chat-btn {
+            position: fixed;
+            bottom: 84px;
+            right: calc(50% - 215px + 16px);
+            width: 48px;
+            height: 48px;
+            background: white;
+            border: 2px solid #EB3223;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 101;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 430px) {
+            .ai-chat-btn {
+                right: 16px;
+            }
+        }
+
+        .ai-chat-btn svg {
+            width: 24px;
+            height: 24px;
+            color: #EB3223;
+        }
+
+        /* 确认弹窗 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            width: 280px;
+            animation: modalSlide 0.3s ease;
+        }
+
+        @keyframes modalSlide {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 500;
+            color: #1F2D3D;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .modal-content {
+            font-size: 15px;
+            color: #8A8F99;
+            margin-bottom: 24px;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            height: 44px;
+            border: none;
+            border-radius: 22px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .modal-btn-cancel {
+            background: #F7F8FA;
+            color: #1F2D3D;
+        }
+
+        .modal-btn-confirm {
+            background: #EB3223;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <div class="avatar-lg">张</div>
+                <div class="page-title">我的</div>
+            </div>
+            <button class="icon-btn" onclick="handleSettings()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- 内容区 -->
+        <main class="content">
+            <!-- 个人信息卡片 -->
+            <section class="module">
+                <div class="profile-card">
+                    <div class="profile-info">
+                        <div class="profile-avatar">张</div>
+                        <div class="profile-details">
+                            <div class="profile-name">张三</div>
+                            <div class="profile-email">zhangsan@example.com</div>
+                            <div class="profile-balance">Rp 10,000,000</div>
+                        </div>
+                    </div>
+                    <button class="edit-btn" onclick="handleEditProfile()">编辑资料</button>
+                </div>
+            </section>
+
+            <!-- 借款管理 -->
+            <section class="module">
+                <div class="function-card">
+                    <div class="function-header">
+                        <div class="function-title">借款管理</div>
+                    </div>
+                    <div class="function-desc">查看我的借款信息</div>
+                    <div class="function-content">
+                        <div class="function-item">
+                            <span class="item-label">Akulaku</span>
+                            <span class="item-value pending">Rp 12,000,000（待还）</span>
+                        </div>
+                        <div class="function-item">
+                            <span class="item-label">Kredivo</span>
+                            <span class="item-value paid">Rp 8,500,000（已还）</span>
+                        </div>
+                    </div>
+                    <button class="outline-btn" onclick="handleViewLoans()">查看全部借款</button>
+                </div>
+            </section>
+
+            <!-- 偏好设置 -->
+            <section class="module">
+                <div class="function-card">
+                    <div class="function-header">
+                        <div class="function-title">偏好设置</div>
+                    </div>
+                    <div class="function-desc">设置你的偏好，如还款提醒、隐私设置等</div>
+                    <div class="function-content">
+                        <div class="function-item">
+                            <span class="item-label">提醒</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="function-item">
+                            <span class="item-label">隐私</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <button class="outline-btn" onclick="handlePreferences()">进入设置</button>
+                </div>
+            </section>
+
+            <!-- 账户安全 -->
+            <section class="module">
+                <div class="function-card">
+                    <div class="function-header">
+                        <div class="function-title">账户安全</div>
+                    </div>
+                    <div class="function-desc">更改密码、开启双重认证等</div>
+                    <div class="function-content">
+                        <div class="function-item">
+                            <span class="item-label">密码设置</span>
+                            <span class="item-value">修改密码</span>
+                        </div>
+                        <div class="function-item">
+                            <span class="item-label">双重认证</span>
+                            <label class="toggle-switch">
+                                <input type="checkbox" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <button class="outline-btn" onclick="handleSecurity()">设置安全选项</button>
+                </div>
+            </section>
+
+            <!-- 数据管理 -->
+            <section class="module">
+                <div class="function-card">
+                    <div class="function-header">
+                        <div class="function-title">数据管理</div>
+                    </div>
+                    <div class="function-desc">删除数据、重新分析</div>
+                    <div class="function-content">
+                        <div class="function-item">
+                            <span class="item-label">重新分析</span>
+                            <span class="item-value">根据当前的借款信息重新生成分析报告</span>
+                        </div>
+                        <div class="function-item">
+                            <span class="item-label">清除所有数据</span>
+                            <span class="item-value">删除已存数据并重新建档</span>
+                        </div>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn" onclick="handleReanalyze()">重新分析</button>
+                        <button class="action-btn secondary" onclick="showClearModal()">清除数据</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Tab Bar - 5个按钮 -->
+        <nav class="tab-bar">
+            <div class="tab-item" onclick="setTab(0)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></div>
+                <span>首页</span>
+            </div>
+            <div class="tab-item" onclick="setTab(1)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+                <span>分析</span>
+            </div>
+            <div class="tab-item" onclick="setTab(2)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg></div>
+            </div>
+            <div class="tab-item" onclick="setTab(3)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+                <span>还款计划</span>
+            </div>
+            <div class="tab-item active" onclick="setTab(4)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>
+                <span>我的</span>
+            </div>
+        </nav>
+
+        <!-- 中间 FAB -->
+        <div class="fab" onclick="handleAddLoan()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+        </div>
+
+        <!-- AI 助手入口 -->
+        <div class="ai-chat-btn" onclick="handleAIChat()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+        </div>
+    </div>
+
+    <!-- 确认弹窗 -->
+    <div class="modal-overlay" id="clearModal">
+        <div class="modal">
+            <div class="modal-title">确认清除数据</div>
+            <div class="modal-content">
+                清除所有数据后，<br>
+                你的借款信息和还款记录将被永久删除。<br>
+                此操作不可恢复！
+            </div>
+            <div class="modal-buttons">
+                <button class="modal-btn modal-btn-cancel" onclick="hideClearModal()">取消</button>
+                <button class="modal-btn modal-btn-confirm" onclick="confirmClear()">确认清除</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleSettings() {
+            alert('设置页面');
+        }
+
+        function handleEditProfile() {
+            alert('编辑个人资料');
+        }
+
+        function handleViewLoans() {
+            alert('查看全部借款\n\n跳转到还款计划页面');
+            window.location.href = 'repayment-plan.html';
+        }
+
+        function handlePreferences() {
+            alert('偏好设置页面');
+        }
+
+        function handleSecurity() {
+            alert('账户安全页面');
+        }
+
+        function handleReanalyze() {
+            alert('重新分析\n\n跳转到分析页面');
+            window.location.href = 'analyzing.html';
+        }
+
+        function showClearModal() {
+            document.getElementById('clearModal').classList.add('show');
+        }
+
+        function hideClearModal() {
+            document.getElementById('clearModal').classList.remove('show');
+        }
+
+        function confirmClear() {
+            hideClearModal();
+            alert('数据已清除！\n\n跳转到未建档首页');
+            window.location.href = 'index-empty.html';
+        }
+
+        function handleAddLoan() {
+            alert('更新/新增借款信息\n\n跳转到上传页面');
+            window.location.href = 'upload-files.html';
+        }
+
+        function setTab(idx) {
+            document.querySelectorAll('.tab-item').forEach((item, i) => {
+                item.classList.toggle('active', i === idx);
+            });
+            if (idx === 0) window.location.href = 'index.html';
+            if (idx === 1) window.location.href = 'report.html';
+            if (idx === 3) window.location.href = 'repayment-plan.html';
+        }
+
+        function handleAIChat() {
+            sessionStorage.setItem('aiReturnUrl', 'profile.html');
+            window.location.href = 'ai-chat.html?from=profile&data=true';
+        }
+    </script>
+</body>
+</html>
