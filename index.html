@@ -2,11 +2,879 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>首页</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 还款助手</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background-color: #FFFFFF;
+            color: #1F2D3D;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 430px;
+            margin: 0 auto;
+            background: #FFFFFF;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* ===== Top Bar ===== */
+        .top-bar {
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            background: white;
+            border-bottom: 1px solid #EDEFF2;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #EB3223, #CC0000);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .app-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1F2D3D;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .icon-btn svg {
+            width: 20px;
+            height: 20px;
+            color: #8A8F99;
+        }
+
+        .eye-open { display: block; }
+        .eye-close { display: none; }
+        .icon-btn.eye-toggled .eye-open { display: none; }
+        .icon-btn.eye-toggled .eye-close { display: block; }
+
+        .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: #EB3223;
+            border-radius: 50%;
+            border: 1px solid white;
+        }
+
+        /* ===== 内容区 ===== */
+        .content {
+            flex: 1;
+            padding: 16px;
+            padding-bottom: 80px;
+            overflow-y: auto;
+            position: relative;
+            min-height: calc(100vh - 120px);
+        }
+
+        .module {
+            margin-bottom: 20px;
+        }
+
+        .module-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #1F2D3D;
+            margin-bottom: 12px;
+        }
+
+        /* ===== 总待还金额卡 ===== */
+        .debt-card {
+            background: white;
+            border: 1px solid #EDEFF2;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        .debt-title {
+            font-size: 14px;
+            color: #8A8F99;
+            margin-bottom: 12px;
+        }
+
+        .debt-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1F2D3D;
+            margin-bottom: 12px;
+        }
+
+        .debt-secondary {
+            font-size: 14px;
+            color: #8A8F99;
+            margin-bottom: 16px;
+        }
+
+        .debt-secondary strong {
+            color: #EB3223;
+        }
+
+        .cta-btn {
+            width: 100%;
+            height: 48px;
+            background: #EB3223;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cta-btn:hover {
+            background: #CC0000;
+            box-shadow: 0 4px 12px rgba(235, 50, 35, 0.3);
+        }
+
+        .cta-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* ===== AI 洞察卡片 ===== */
+        .insight-card {
+            background: white;
+            border: 1px solid #EDEFF2;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .insight-card.risk {
+            border-left: 4px solid #EB3223;
+        }
+
+        .insight-card.positive {
+            border-left: 4px solid #6BCF7F;
+        }
+
+        .insight-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .insight-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1F2D3D;
+        }
+
+        .insight-title.risk {
+            color: #EB3223;
+        }
+
+        .insight-title.positive {
+            color: #6BCF7F;
+        }
+
+        .insight-text {
+            font-size: 14px;
+            color: #8A8F99;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .insight-action {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .insight-btn {
+            border: none;
+            background: none;
+            color: #EB3223;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #EDEFF2;
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #EB3223;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .toggle-label {
+            font-size: 12px;
+            color: #8A8F99;
+            margin-left: 8px;
+        }
+
+        /* ===== 平台卡片滑动 ===== */
+        .platform-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .platform-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .platform-card {
+            flex-shrink: 0;
+            width: 140px;
+            background: white;
+            border: 1px solid #EDEFF2;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .platform-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1F2D3D;
+            margin-bottom: 8px;
+        }
+
+        .platform-amount {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1F2D3D;
+            margin-bottom: 6px;
+        }
+
+        .platform-status {
+            font-size: 12px;
+            color: #8A8F99;
+        }
+
+        .platform-status.urgent {
+            color: #EB3223;
+        }
+
+        .platform-status.paid {
+            color: #6BCF7F;
+        }
+
+        /* ===== 账单列表 ===== */
+        .bill-list {
+            background: white;
+            border: 1px solid #EDEFF2;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .bill-item {
+            padding: 16px;
+            border-bottom: 1px solid #EDEFF2;
+        }
+
+        .bill-item:last-child {
+            border-bottom: none;
+        }
+
+        .bill-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .bill-platform {
+            font-size: 15px;
+            font-weight: 500;
+            color: #1F2D3D;
+        }
+
+        .bill-date {
+            font-size: 13px;
+            color: #8A8F99;
+        }
+
+        .bill-amount {
+            font-size: 16px;
+            font-weight: 600;
+            color: #EB3223;
+            margin-bottom: 4px;
+        }
+
+        .bill-status {
+            font-size: 12px;
+            color: #8A8F99;
+        }
+
+        .bill-status.paid {
+            color: #6BCF7F;
+        }
+
+        .bill-status.pending {
+            color: #EB3223;
+        }
+
+        /* ===== Tab Bar ===== */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            height: 64px;
+            background: white;
+            border-top: 1px solid #EDEFF2;
+            display: flex;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .tab-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #8A8F99;
+            cursor: pointer;
+        }
+
+        .tab-item.active {
+            color: #EB3223;
+        }
+
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 2px;
+        }
+
+        .tab-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        /* 中间 FAB */
+        .fab {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 56px;
+            height: 56px;
+            background: #EB3223;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 101;
+            cursor: pointer;
+        }
+
+        .fab svg {
+            width: 28px;
+            height: 28px;
+            color: white;
+        }
+
+        /* AI 机器人入口 - 固定在页面右下角（内容区内） */
+        .ai-chat-btn {
+            position: fixed;
+            bottom: 84px;
+            right: calc(50% - 215px + 16px);
+            width: 48px;
+            height: 48px;
+            background: white;
+            border: 2px solid #EB3223;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 101;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 430px) {
+            .ai-chat-btn {
+                right: 16px;
+            }
+        }
+
+        .ai-chat-btn svg {
+            width: 24px;
+            height: 24px;
+            color: #EB3223;
+        }
+
+        /* AI 助手弹窗 */
+        .ai-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .ai-modal-overlay.show {
+            display: flex;
+        }
+
+        .ai-modal {
+            width: 100%;
+            max-width: 430px;
+            background: white;
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        .ai-modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .ai-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #EB3223, #CC0000);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ai-avatar svg {
+            width: 28px;
+            height: 28px;
+            color: white;
+        }
+
+        .ai-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1F2D3D;
+        }
+
+        .ai-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #F5F5F5;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .ai-close svg {
+            width: 20px;
+            height: 20px;
+            color: #8A8F99;
+        }
+
+        .ai-content {
+            font-size: 15px;
+            color: #1F2D3D;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .ai-info-box {
+            background: #FFF0F0;
+            border-left: 3px solid #EB3223;
+            padding: 12px 16px;
+            margin: 16px 0;
+            border-radius: 8px;
+        }
+
+        .ai-info-title {
+            font-weight: 500;
+            color: #EB3223;
+            margin-bottom: 8px;
+        }
+
+        .ai-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 14px;
+        }
+
+        .ai-info-label {
+            color: #8A8F99;
+        }
+
+        .ai-info-value {
+            font-weight: 500;
+            color: #1F2D3D;
+        }
+
+        .ai-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ai-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .ai-btn-primary {
+            background: #EB3223;
+            color: white;
+        }
+
+        .ai-btn-primary:hover {
+            background: #CC0000;
+        }
+
+        .ai-btn-secondary {
+            background: #F7F8FA;
+            color: #1F2D3D;
+        }
+
+        .ai-btn-secondary:hover {
+            background: #EDEFF2;
+        }
+
+        .ai-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+    </style>
 </head>
-<script>
-    // 自动跳转到你的welcome.html页面
-    window.location.href = "welcome.html";
-</script>
-<body></body>
+<body>
+    <div class="container">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="top-bar-left">
+                <div class="avatar">A</div>
+                <div class="app-title">AI 还款助手</div>
+            </div>
+            <div class="top-bar-right">
+                <button class="icon-btn eye-toggled" id="eyeBtn" onclick="toggleEye()">
+                    <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    <svg class="eye-close" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a9.97 9.97 0 01-1.563 3.029m-1.41-1.41A9.953 9.953 0 0012 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 01.563-3.029"/>
+                    </svg>
+                </button>
+                <button class="icon-btn" onclick="handleNotification()">
+                    <span class="badge"></span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- 内容区 -->
+        <main class="content">
+            <!-- 模块一: 总待还金额 -->
+            <section class="module">
+                <div class="debt-card">
+                    <div class="debt-title">总待还金额（Total Debt）</div>
+                    <div class="debt-value">Rp 128,450,000</div>
+                    <div class="debt-secondary">
+                        7 天内待还 <strong>Rp 3,200,000</strong>
+                    </div>
+                    <button class="cta-btn" onclick="handleQuickPay()">一键还款</button>
+                </div>
+            </section>
+
+            <!-- 模块二: AI 智能洞察 -->
+            <section class="module">
+                <div class="module-title">AI 智能洞察</div>
+                
+                <!-- 洞察卡片 1（正向） -->
+                <div class="insight-card positive">
+                    <div class="insight-header">
+                        <div class="insight-title positive">利息节省机会</div>
+                    </div>
+                    <div class="insight-text">
+                        通过提前结清 Akulaku 的本月账单，<br>
+                        你可以减少约 <strong>Rp 450,000</strong> 的利息支出
+                    </div>
+                    <div class="insight-action">
+                        <button class="insight-btn" onclick="viewStrategy()">查看策略</button>
+                    </div>
+                </div>
+
+                <!-- 洞察卡片 2（风险） -->
+                <div class="insight-card risk">
+                    <div class="insight-header">
+                        <div class="insight-title risk">逾期风险预警</div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="insight-text">
+                        检测到 Kredivo 的还款日<br>
+                        与工资发放日不匹配，存在逾期风险
+                    </div>
+                    <div class="insight-action">
+                        <span class="toggle-label">开启中</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 模块三: 已关联平台 -->
+            <section class="module">
+                <div class="module-title">已关联平台</div>
+                <div class="platform-scroll">
+                    <!-- 平台卡片 1 -->
+                    <div class="platform-card">
+                        <div class="platform-name">Akulaku</div>
+                        <div class="platform-amount">Rp 42,100,000</div>
+                        <div class="platform-status urgent">3 天后到期</div>
+                    </div>
+                    <!-- 平台卡片 2 -->
+                    <div class="platform-card">
+                        <div class="platform-name">Kredivo</div>
+                        <div class="platform-amount">Rp 15,400,000</div>
+                        <div class="platform-status paid">本月已还</div>
+                    </div>
+                    <!-- 平台卡片 3 -->
+                    <div class="platform-card">
+                        <div class="platform-name">Shopee PayLater</div>
+                        <div class="platform-amount">Rp 7,600,000</div>
+                        <div class="platform-status">12 天后到期</div>
+                    </div>
+                    <!-- 平台卡片 4 -->
+                    <div class="platform-card">
+                        <div class="platform-name">AdaKami</div>
+                        <div class="platform-amount">Rp 9,800,000</div>
+                        <div class="platform-status">18 天后到期</div>
+                    </div>
+                    <!-- 平台卡片 5 -->
+                    <div class="platform-card">
+                        <div class="platform-name">EasyCash</div>
+                        <div class="platform-amount">Rp 6,300,000</div>
+                        <div class="platform-status">25 天后到期</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 模块四: 近期账单 -->
+            <section class="module">
+                <div class="module-title">近期账单</div>
+                <div class="bill-list">
+                    <!-- 账单 1 -->
+                    <div class="bill-item">
+                        <div class="bill-header">
+                            <div class="bill-platform">Kredivo · 分期账单</div>
+                            <div class="bill-date">2025-01-24</div>
+                        </div>
+                        <div class="bill-amount">- Rp 1,200,000</div>
+                        <div class="bill-status paid">已还款</div>
+                    </div>
+                    <!-- 账单 2 -->
+                    <div class="bill-item">
+                        <div class="bill-header">
+                            <div class="bill-platform">Akulaku · 月度账单</div>
+                            <div class="bill-date">2025-01-22</div>
+                        </div>
+                        <div class="bill-amount">- Rp 3,500,000</div>
+                        <div class="bill-status pending">待还</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Tab Bar - 5个按钮 -->
+        <nav class="tab-bar">
+            <div class="tab-item active" onclick="setTab(0)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></div>
+                <span>首页</span>
+            </div>
+            <div class="tab-item" onclick="setTab(1)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
+                <span>分析</span>
+            </div>
+            <div class="tab-item" onclick="setTab(2)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg></div>
+            </div>
+            <div class="tab-item" onclick="setTab(3)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+                <span>还款计划</span>
+            </div>
+            <div class="tab-item" onclick="setTab(4)">
+                <div class="tab-icon"><svg viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>
+                <span>我的</span>
+            </div>
+        </nav>
+
+        <!-- 中间 FAB -->
+        <div class="fab" onclick="handleAddLoan()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+        </div>
+
+        <!-- AI 助手入口 -->
+        <div class="ai-chat-btn" onclick="handleAIChat()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleEye() {
+            document.getElementById('eyeBtn').classList.toggle('eye-toggled');
+        }
+
+        function handleNotification() {
+            alert('通知中心');
+        }
+
+        function handleQuickPay() {
+            alert('一键还款\n\n跳转到还款计划页面');
+            window.location.href = 'repayment-plan.html';
+        }
+
+        function viewStrategy() {
+            alert('查看节省利息策略\n\n跳转到还款计划页面');
+            window.location.href = 'repayment-plan.html';
+        }
+
+        function handleAddLoan() {
+            alert('更新/新增借款信息\n\n跳转到上传页面');
+            window.location.href = 'upload-files.html';
+        }
+
+        function setTab(idx) {
+            document.querySelectorAll('.tab-item').forEach((item, i) => {
+                item.classList.toggle('active', i === idx);
+            });
+            // 已建档用户跳转到完整数据页面
+            if (idx === 1) window.location.href = 'report.html';
+            if (idx === 3) window.location.href = 'repayment-plan.html';
+            if (idx === 4) window.location.href = 'profile.html';
+        }
+
+        function handleAIChat() {
+            sessionStorage.setItem('aiReturnUrl', 'index.html');
+            window.location.href = 'ai-chat.html?from=dashboard&data=true';
+        }
+    </script>
+</body>
 </html>
